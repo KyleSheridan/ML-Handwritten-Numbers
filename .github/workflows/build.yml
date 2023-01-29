@@ -1,0 +1,34 @@
+name: Build Tests
+
+on: [pull_request]
+
+jobs:
+  Build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config: 
+          - {
+            name: "Windows/X64/Release",
+            os: windows-latest,
+            config: Release,
+            args: -G "Visual Studio 17 2022" -A x64,
+          }
+          - {
+            name: "Windows/X64/Debug",
+            os: windows-latest,
+            config: Debug,
+            args: -G "Visual Studio 17 2022" -A x64,
+          }
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create Work Dirs
+        run: |
+          mkdir build
+      - name: Build
+        working-directory: ./build
+        run: |
+          cmake .. ${{ matrix.config.cmake_extra_args }} -DCMAKE_BUILD_TYPE=${{ matrix.config.config }}
+          cmake --build . -j --config ${{ matrix.config.config }}
