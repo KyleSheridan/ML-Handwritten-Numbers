@@ -9,4 +9,5 @@ namespace Renderer {
 
 	SDL_Renderer* GetRenderer();
 	SDL_Window* GetWindow();
+	SDL_Surface* GetScreen();
 } // namespace Renderer

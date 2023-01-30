@@ -35,11 +35,63 @@ public:
 	}
 };
 
+void DrawPixel(SDL_Surface* surface, int x, int y, Uint32 pixel) {
+	int bpp = surface->format->BytesPerPixel;
+	/* Here p is the address to the pixel we want to set */
+	Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
+
+	switch (bpp) {
+	case 1:
+		*p = pixel;
+		break;
+
+	case 2:
+		*(Uint16*)p = pixel;
+		break;
+
+	case 3:
+		if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+			p[0] = (pixel >> 16) & 0xff;
+			p[1] = (pixel >> 8) & 0xff;
+			p[2] = pixel & 0xff;
+		}
+		else {
+			p[0] = pixel & 0xff;
+			p[1] = (pixel >> 8) & 0xff;
+			p[2] = (pixel >> 16) & 0xff;
+		}
+		break;
+
+	case 4:
+		*(Uint32*)p = pixel;
+		break;
+	}
+}
+
+void RenderNumber(Number num, int size = 10) {
+	for (int i = 0; i < 28; i++)
+	{
+		for (int j = 0; j < 28; j++)
+		{
+			Uint32 colour = SDL_MapRGB(Renderer::GetScreen()->format, num.pixels[(28 - 1) - i][j], num.pixels[(28 - 1) - i][j], num.pixels[(28 - 1) - i][j]);
+			//DrawPixel(Renderer::GetScreen(), j + 100, i + 100, colour);
+			for (int x = 0; x < size; x++)
+			{
+				for (int y = 0; y < size; y++)
+				{
+					DrawPixel(Renderer::GetScreen(), (j*size) + x, (i*size) + y, colour);
+				}
+			}
+		}
+	}
+}
+
 int main(int argc, char* args[]) {
 	if (!Renderer::InitializeRenderer()) {
 		return 1;
 	}
-	Number image;
+	Number num1;
+	Number num2;
 
 	std::string filepath = std::string("../DataSets/t10k-images.idx3-ubyte");
 	std::ifstream file(filepath.c_str());
@@ -60,25 +112,33 @@ int main(int argc, char* args[]) {
 
 		Number temp{};
 		file.read((char*)&temp, sizeof(Number));
-		image = temp;
-	
-		/*for (int i = 0; i < 28; i++)
-		{
-			Number temp{};
-			for (int j = 0; j < 28; j++)
-			{
-				file.read((char*)&temp, sizeof(Number));
-				image = temp;
-			}
-		}*/
+		num1 = temp;
 
-		image.format_pixels();
+		num1.format_pixels();
+
+		file.read((char*)&temp, sizeof(Number));
+		num2 = temp;
+
+		num2.format_pixels();
 	}
 
 
 	SDL_Event e;
 	bool running = true;
 	while (running) {
+
+		RenderNumber(num1);
+
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), Renderer::GetScreen());
+		if (texture == nullptr) {
+			fprintf(stderr, "CreateTextureFromSurface failed: %s\n", SDL_GetError());
+			exit(1);
+		}
+		SDL_FreeSurface(Renderer::GetScreen());
+		SDL_RenderCopyEx(Renderer::GetRenderer(), texture, nullptr, nullptr, 0, 0, SDL_FLIP_VERTICAL);
+		SDL_RenderPresent(Renderer::GetRenderer());
+
+		SDL_DestroyTexture(texture);
 
 		while (SDL_PollEvent(&e) != 0) {
 			switch (e.type)

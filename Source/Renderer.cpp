@@ -4,6 +4,7 @@ namespace Renderer {
 	namespace {
 		extern SDL_Window* g_Window = nullptr;
 		extern SDL_Renderer* g_Renderer = nullptr;
+		extern SDL_Surface* g_Screen = nullptr;
 	}
 
 	bool InitializeRenderer() {
@@ -29,6 +30,8 @@ namespace Renderer {
 			std::cout << "Could not create renderer: " << SDL_GetError();
 		}
 
+		g_Screen = SDL_GetWindowSurface(g_Window);
+
 		std::cout << "Renderer Initialized!\n";
 
 		return true;
@@ -51,5 +54,10 @@ namespace Renderer {
 	SDL_Window* GetWindow()
 	{
 		return g_Window;
+	}
+
+	SDL_Surface* GetScreen()
+	{
+		return g_Screen;
 	}
 }
