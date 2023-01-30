@@ -93,8 +93,10 @@ int main(int argc, char* args[]) {
 	Number num1;
 	Number num2;
 
-	std::string filepath = std::string("../DataSets/t10k-images.idx3-ubyte");
-	std::ifstream file(filepath.c_str());
+	std::vector<Number> nums;
+
+	std::string filepath = std::string("../DataSets/train-images.idx3-ubyte");
+	std::ifstream file(filepath.c_str(), std::ios::binary);
 
 	if (file.is_open()) {
 		int32_t magic_number = 0;
@@ -110,24 +112,32 @@ int main(int argc, char* args[]) {
 		file.read((char*)&n_cols, sizeof(n_cols));
 		n_cols = reverseInt(n_cols);
 
-		Number temp{};
-		file.read((char*)&temp, sizeof(Number));
-		num1 = temp;
+		for (int i = 0; i < number_of_images; i++)
+		{
+			Number temp{};
+			file.read((char*)&temp, sizeof(Number));
+			nums.emplace_back(temp);
+		}
 
-		num1.format_pixels();
+		//Number temp{};
+		//file.read((char*)&temp, sizeof(Number));
+		//num1 = temp;
 
-		file.read((char*)&temp, sizeof(Number));
-		num2 = temp;
+		////num1.format_pixels();
 
-		num2.format_pixels();
+		//file.read((char*)&temp, sizeof(Number));
+		//num2 = temp;
+
+		////num2.format_pixels();
 	}
 
+	int idx = 0;
 
 	SDL_Event e;
 	bool running = true;
 	while (running) {
 
-		RenderNumber(num1);
+		RenderNumber(nums[idx]);
 
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), Renderer::GetScreen());
 		if (texture == nullptr) {
@@ -149,7 +159,11 @@ int main(int argc, char* args[]) {
 				case SDLK_ESCAPE:
 					running = false;
 					break;
+				case SDLK_TAB:
+					idx++;
+					break;
 				}
+
 			}
 		}
 
