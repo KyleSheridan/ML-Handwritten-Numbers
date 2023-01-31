@@ -16,7 +16,7 @@ public:
 	bool input();
 	void draw();
 
-	int reverseInt(int i);
+	int reverseInt(int i); // used to correctly read the idx files
 
 private:
 	SDL_Event e;

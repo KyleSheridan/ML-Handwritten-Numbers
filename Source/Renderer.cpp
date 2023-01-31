@@ -13,8 +13,6 @@ namespace Renderer {
 			return false;
 		}
 
-		// initialise ttf  if (TTF_Init() < 0)
-
 		//create window
 		g_Window = SDL_CreateWindow("ML- Handwritten Numbers", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 280, 280, SDL_WINDOW_SHOWN);
 
@@ -100,7 +98,6 @@ namespace Renderer {
 			for (int j = 0; j < 28; j++)
 			{
 				Uint32 colour = SDL_MapRGB(g_Screen->format, num.pixels[(28 - 1) - i][j], num.pixels[(28 - 1) - i][j], num.pixels[(28 - 1) - i][j]);
-				//DrawPixel(Renderer::GetScreen(), j + 100, i + 100, colour);
 				for (int x = 0; x < size; x++)
 				{
 					for (int y = 0; y < size; y++)

@@ -10,7 +10,6 @@ bool ProgramLoop::init()
 	std::string imageFilepath = std::string("../DataSets/train-images.idx3-ubyte");
 	std::string valueFilepath = std::string("../DataSets/train-labels.idx1-ubyte");
 
-
 	std::ifstream file(imageFilepath.c_str(), std::ios::binary);
 
 	if (file.is_open()) {
