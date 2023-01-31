@@ -2,7 +2,6 @@
 #include <iostream>
 
 struct Number {
-public:
 	uint8_t pixels[28][28];
 
 	void format_pixels() {
@@ -15,4 +14,8 @@ public:
 			std::cout << "\n";
 		}
 	}
+};
+
+struct TrainingNumber : Number {
+	uint8_t value;
 };

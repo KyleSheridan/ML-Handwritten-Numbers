@@ -7,8 +7,11 @@ bool ProgramLoop::init()
 		return false;
 	}
 
-	std::string filepath = std::string("../DataSets/train-images.idx3-ubyte");
-	std::ifstream file(filepath.c_str(), std::ios::binary);
+	std::string imageFilepath = std::string("../DataSets/train-images.idx3-ubyte");
+	std::string valueFilepath = std::string("../DataSets/train-labels.idx1-ubyte");
+
+
+	std::ifstream file(imageFilepath.c_str(), std::ios::binary);
 
 	if (file.is_open()) {
 		int32_t magic_number = 0;
@@ -26,11 +29,33 @@ bool ProgramLoop::init()
 
 		for (int i = 0; i < number_of_images; i++)
 		{
-			Number temp{};
+			TrainingNumber temp{};
 			file.read((char*)&temp, sizeof(Number));
 			trainingNums.emplace_back(temp);
 		}
 	}
+
+	file.close();
+
+	file.open(valueFilepath.c_str(), std::ios::binary);
+
+	if (file.is_open()) {
+		int32_t magic_number = 0;
+		int32_t number_of_items = 0;
+		file.read((char*)&magic_number, sizeof(magic_number));
+		magic_number = reverseInt(magic_number);
+		file.read((char*)&number_of_items, sizeof(number_of_items));
+		number_of_items = reverseInt(number_of_items);
+
+		for (int i = 0; i < number_of_items; i++)
+		{
+			uint8_t temp;
+			file.read((char*)&temp, sizeof(uint8_t));
+			trainingNums[i].value = temp;
+		}
+	}
+
+	std::cout << (int)trainingNums[currentImage].value << "\n";
 
 	return true;
 }
@@ -48,6 +73,7 @@ bool ProgramLoop::input()
 				break;
 			case SDLK_TAB:
 				currentImage++;
+				std::cout << (int)trainingNums[currentImage].value << "\n";
 				break;
 			}
 		}

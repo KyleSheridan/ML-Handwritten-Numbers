@@ -16,7 +16,7 @@ namespace Renderer {
 		// initialise ttf  if (TTF_Init() < 0)
 
 		//create window
-		g_Window = SDL_CreateWindow("Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 280, 280, SDL_WINDOW_SHOWN);
+		g_Window = SDL_CreateWindow("ML- Handwritten Numbers", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 280, 280, SDL_WINDOW_SHOWN);
 
 		if (!g_Window) {
 			std::cout << "Could not create window: " << SDL_GetError();

@@ -21,7 +21,7 @@ public:
 private:
 	SDL_Event e;
 
-	std::vector<Number> trainingNums;
+	std::vector<TrainingNumber> trainingNums;
 
 	int currentImage;
 };
