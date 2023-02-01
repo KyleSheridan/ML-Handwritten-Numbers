@@ -3,13 +3,14 @@
 std::vector<double> Layer::CalculateOutputs(std::vector<double> inputs)
 {
 	std::vector<double> weightedInputs;
+	weightedInputs.reserve(numNodesOut);
 
 	for (int nodeOut = 0; nodeOut < numNodesOut; nodeOut++)
 	{
 		double weightedInput = biases[nodeOut];
 		for (int nodeIn = 0; nodeIn < numNodesIn; nodeIn++)
 		{
-			weightedInput += *(inputs[nodeIn]) * weights[nodeIn][nodeOut];
+			weightedInput += inputs[nodeIn] * weights[nodeIn][nodeOut];
 		}
 		weightedInputs[nodeOut] = weightedInput;
 	}

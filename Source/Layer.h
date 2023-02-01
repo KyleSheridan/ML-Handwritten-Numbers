@@ -7,6 +7,9 @@ public:
 	Layer(int _numNodesIn, int _numNodesOut) {
 		numNodesIn = _numNodesIn;
 		numNodesOut = _numNodesOut;
+
+		weights.reserve(numNodesIn);
+		biases.reserve(numNodesOut);
 	}
 
 	std::vector<double> CalculateOutputs(std::vector<double> inputs);
