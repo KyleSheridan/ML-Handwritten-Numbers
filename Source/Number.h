@@ -16,6 +16,13 @@ struct Number {
 	}
 };
 
-struct TrainingNumber : Number {
-	uint8_t value;
+class TrainingNumber {
+public:
+	TrainingNumber(Number* _image, uint8_t* _value) {
+		image = _image;
+		value = _value;
+	}
+
+	Number* image;
+	uint8_t* value;
 };

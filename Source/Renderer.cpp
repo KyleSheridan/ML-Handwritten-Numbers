@@ -92,12 +92,12 @@ namespace Renderer {
 		}
 	}
 
-	void RenderNumber(Number num, int size) {
+	void RenderNumber(Number* num, int size) {
 		for (int i = 0; i < 28; i++)
 		{
 			for (int j = 0; j < 28; j++)
 			{
-				Uint32 colour = SDL_MapRGB(g_Screen->format, num.pixels[(28 - 1) - i][j], num.pixels[(28 - 1) - i][j], num.pixels[(28 - 1) - i][j]);
+				Uint32 colour = SDL_MapRGB(g_Screen->format, num->pixels[(28 - 1) - i][j], num->pixels[(28 - 1) - i][j], num->pixels[(28 - 1) - i][j]);
 				for (int x = 0; x < size; x++)
 				{
 					for (int y = 0; y < size; y++)
