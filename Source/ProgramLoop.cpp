@@ -35,6 +35,16 @@ bool ProgramLoop::input()
 				currentImage++;
 				std::cout << (int)*trainingNums[currentImage].value << "\n";
 				break;
+			default:
+				break;
+			}
+		case SDL_WINDOWEVENT:
+			switch (e.window.event)
+			{
+			case SDL_WINDOWEVENT_CLOSE:
+				return false;
+			default:
+				break;
 			}
 		}
 	}
@@ -67,7 +77,7 @@ void ProgramLoop::ReadFile(const char* filename, std::vector<T>* vec, H header, 
 		file.read((char*)&header, sizeof(H));
 		header.Initialize();
 
-		for (int i = 0; i < header.number_of_images; i++)
+		for (int i = 0; i < header.numberOfImages; i++)
 		{
 			C object{};
 			file.read((char*)&object, sizeof(C));

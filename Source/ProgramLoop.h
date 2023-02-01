@@ -7,14 +7,14 @@
 #include "Renderer.h"
 
 struct IDX3_Header {
-	int32_t magic_number = 0;
-	int32_t number_of_images = 0;
+	int32_t magicNumber = 0;
+	int32_t numberOfImages = 0;
 	int n_rows = 0;
 	int n_cols = 0;
 
 	void Initialize() {
-		magic_number = reverseInt(magic_number);
-		number_of_images = reverseInt(number_of_images);
+		magicNumber = reverseInt(magicNumber);
+		numberOfImages = reverseInt(numberOfImages);
 		n_rows = reverseInt(n_rows);
 		n_cols = reverseInt(n_cols);
 	}
@@ -34,12 +34,12 @@ struct IDX3_Header {
 };
 
 struct IDX1_Header {
-	int32_t magic_number = 0;
-	int32_t number_of_images = 0;
+	int32_t magicNumber = 0;
+	int32_t numberOfImages = 0;
 
 	void Initialize() {
-		magic_number = reverseInt(magic_number);
-		number_of_images = reverseInt(number_of_images);
+		magicNumber = reverseInt(magicNumber);
+		numberOfImages = reverseInt(numberOfImages);
 	}
 
 	// used to correctly read the idx files
