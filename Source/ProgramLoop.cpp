@@ -38,6 +38,7 @@ bool ProgramLoop::input()
 			default:
 				break;
 			}
+			break;
 		case SDL_WINDOWEVENT:
 			switch (e.window.event)
 			{
@@ -46,6 +47,7 @@ bool ProgramLoop::input()
 			default:
 				break;
 			}
+			break;
 		}
 	}
 
