@@ -1,30 +1,19 @@
 #define SDL_MAIN_HANDLED
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
 #include <SDL.h>
 
-#include "Renderer.h"
+#include "ProgramLoop.h"
 
 int main(int argc, char* args[]) {
-	if (!Renderer::InitializeRenderer()) {
-		return 1;
-	}
+	ProgramLoop* program = new ProgramLoop();
 
-	SDL_Event e;
-	bool running = true;
-	while (running) {
+	if (!program->init()) { return 1; }
 
-		while (SDL_PollEvent(&e) != 0) {
-			switch (e.type)
-			{
-			case SDL_KEYDOWN:
-				switch (e.key.keysym.sym)
-				{
-				case SDLK_ESCAPE:
-					running = false;
-					break;
-				}
-			}
-		}
+	while (program->input()) {
+		program->draw();
 
 		SDL_Delay(16);
 	}
