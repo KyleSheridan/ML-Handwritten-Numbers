@@ -5,6 +5,7 @@
 #include <SDL.h>
 
 #include "Renderer.h"
+#include "DataPoint.h"
 
 struct IDX3_Header {
 	int32_t magicNumber = 0;
@@ -75,6 +76,8 @@ private:
 	std::vector<Number> images;
 	std::vector<uint8_t> values;
 	std::vector<TrainingNumber> trainingNums;
+
+	std::unique_ptr<DataPoint> currentData;
 
 	int currentImage;
 };

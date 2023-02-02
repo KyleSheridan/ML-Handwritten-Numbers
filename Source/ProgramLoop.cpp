@@ -15,6 +15,8 @@ bool ProgramLoop::init()
 		trainingNums.push_back(TrainingNumber(&images[i], &values[i]));
 	}
 
+	currentData = std::make_unique<DataPoint>(&trainingNums[currentImage]);
+
 	std::cout << (int)*trainingNums[currentImage].value << "\n";
 
 	return true;
@@ -34,6 +36,8 @@ bool ProgramLoop::input()
 			case SDLK_TAB:
 				currentImage++;
 				std::cout << (int)*trainingNums[currentImage].value << "\n";
+
+				currentData = std::make_unique<DataPoint>(&trainingNums[currentImage]);
 				break;
 			default:
 				break;

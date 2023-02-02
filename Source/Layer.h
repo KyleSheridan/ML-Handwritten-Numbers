@@ -15,6 +15,7 @@ public:
 
 	std::vector<double> CalculateOutputs(std::vector<double> inputs);
 	double ActivationFunction(double weightedInput);
+	double NodeCost(double outputActivation, double expectedOutput);
 
 private:
 	int numNodesIn, numNodesOut;

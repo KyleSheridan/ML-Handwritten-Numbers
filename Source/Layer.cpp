@@ -22,3 +22,9 @@ double Layer::ActivationFunction(double weightedInput)
 {
 	return 1 / (1 + std::exp(-weightedInput));
 }
+
+double Layer::NodeCost(double outputActivation, double expectedOutput)
+{
+	double error = outputActivation - expectedOutput;
+	return error * error;
+}
