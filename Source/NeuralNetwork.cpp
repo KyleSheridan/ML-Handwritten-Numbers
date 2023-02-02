@@ -38,3 +38,29 @@ int NeuralNetwork::IndexOfMaxValue(std::vector<double> arr)
 
 	return index;
 }
+
+double NeuralNetwork::Cost(DataPoint* dataPoint)
+{
+	std::vector<double> outputs = CalculateOutputs(dataPoint->inputs);
+	Layer outputLayer = layers[layers.size() - 1];
+	double cost = 0;
+
+	for (int nodeOut = 0; nodeOut < outputs.size(); nodeOut++)
+	{
+		cost += outputLayer.NodeCost(outputs[nodeOut], dataPoint->expectedOutputs[nodeOut]);
+	}
+
+	return cost;
+}
+
+double NeuralNetwork::Cost(std::vector<DataPoint> data)
+{
+	double totalCost = 0;
+
+	for(DataPoint dataPoint : data)
+	{
+		totalCost += Cost(&dataPoint);
+	}
+
+	return totalCost / data.size();
+}

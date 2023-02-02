@@ -1,6 +1,8 @@
 #pragma once
 #include <float.h>
+
 #include "Layer.h";
+#include "DataPoint.h"
 
 class NeuralNetwork {
 public:
@@ -17,6 +19,11 @@ public:
     int Classify(std::vector<double> inputs);
 
     int IndexOfMaxValue(std::vector<double> arr);
+
+    double Cost(std::vector<DataPoint> data);
+
 private:
+    double Cost(DataPoint* dataPoint);
+
     std::vector<Layer> layers;
 };
