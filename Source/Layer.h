@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 class Layer {
 public:
@@ -13,6 +14,7 @@ public:
 	}
 
 	std::vector<double> CalculateOutputs(std::vector<double> inputs);
+	double ActivationFunction(double weightedInput);
 
 private:
 	int numNodesIn, numNodesOut;

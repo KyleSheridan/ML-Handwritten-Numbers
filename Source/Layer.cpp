@@ -12,8 +12,13 @@ std::vector<double> Layer::CalculateOutputs(std::vector<double> inputs)
 		{
 			weightedInput += inputs[nodeIn] * weights[nodeIn][nodeOut];
 		}
-		weightedInputs[nodeOut] = weightedInput;
+		weightedInputs[nodeOut] = ActivationFunction(weightedInput);
 	}
 
 	return weightedInputs;
+}
+
+double Layer::ActivationFunction(double weightedInput)
+{
+	return 1 / (1 + std::exp(-weightedInput));
 }
