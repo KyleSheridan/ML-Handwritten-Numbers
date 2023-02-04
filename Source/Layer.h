@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <time.h>
 #include <vector>
 #include <cmath>
 
@@ -14,11 +15,17 @@ public:
 	}
 
 	std::vector<double> CalculateOutputs(std::vector<double> inputs);
-	double ActivationFunction(double weightedInput);
 	double NodeCost(double outputActivation, double expectedOutput);
+	void ApplyGradients(double learnRate);
+
+private:
+	double ActivationFunction(double weightedInput);
+	void InitializeRandomWeights();
 
 private:
 	int numNodesIn, numNodesOut;
+	std::vector<std::vector<double>> costGradientW;
+	std::vector<double> costGradientB;
 	std::vector<std::vector<double>> weights;
 	std::vector<double> biases;
 };

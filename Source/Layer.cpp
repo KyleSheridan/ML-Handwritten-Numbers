@@ -18,13 +18,42 @@ std::vector<double> Layer::CalculateOutputs(std::vector<double> inputs)
 	return weightedInputs;
 }
 
+double Layer::NodeCost(double outputActivation, double expectedOutput)
+{
+	double error = outputActivation - expectedOutput;
+	return error * error;
+}
+
+void Layer::ApplyGradients(double learnRate)
+{
+	for (int nodeOut = 0; nodeOut < numNodesOut; nodeOut++)
+	{
+		biases[nodeOut] -= costGradientB[nodeOut] * learnRate;
+
+		for (int nodeIn = 0; nodeIn < numNodesIn; nodeIn++)
+		{
+			weights[nodeIn][nodeOut] = costGradientW[nodeIn][nodeOut] * learnRate;
+		}
+	}
+}
+
 double Layer::ActivationFunction(double weightedInput)
 {
 	return 1 / (1 + std::exp(-weightedInput));
 }
 
-double Layer::NodeCost(double outputActivation, double expectedOutput)
+void Layer::InitializeRandomWeights()
 {
-	double error = outputActivation - expectedOutput;
-	return error * error;
+	srand(time(NULL));
+
+	for (int nodeIn = 0; nodeIn < numNodesIn; nodeIn++)
+	{
+		for (int nodeOut = 0; nodeOut < numNodesOut; nodeOut++)
+		{
+			double randomVal = (rand() / (double)RAND_MAX) * 2 - 1;
+
+			// 1 / sqrt(numInputs) works best for sigmoid (Change with activation function)
+			weights[nodeIn][nodeOut] = randomVal / sqrt(numNodesIn);
+		}
+	}
 }
