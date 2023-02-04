@@ -10,12 +10,23 @@ bool ProgramLoop::init()
 	ReadFile("../DataSets/train-images.idx3-ubyte", &images, IDX3_Header{}, Number{});
 	ReadFile("../DataSets/train-labels.idx1-ubyte", &values, IDX1_Header{}, uint8_t{});
 
+	trainingNums.reserve(images.size());
+	trainingData.reserve(images.size());
+
 	for (int i = 0; i < images.size(); i++)
 	{
-		trainingNums.push_back(TrainingNumber(&images[i], &values[i]));
+		trainingNums.emplace_back(TrainingNumber(&images[i], &values[i]));
+
+		trainingData.emplace_back(new DataPoint(&trainingNums[i]));
 	}
 
 	currentData = std::make_unique<DataPoint>(&trainingNums[currentImage]);
+
+	std::vector<int> layers = { 784, 784, 784, 10 };
+
+	network = new NeuralNetwork(layers);
+
+	network->Learn(trainingData, 0.26);
 
 	std::cout << (int)*trainingNums[currentImage].value << "\n";
 

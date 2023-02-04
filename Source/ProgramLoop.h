@@ -6,6 +6,7 @@
 
 #include "Renderer.h"
 #include "DataPoint.h"
+#include "NeuralNetwork.h"
 
 struct IDX3_Header {
 	int32_t magicNumber = 0;
@@ -77,7 +78,11 @@ private:
 	std::vector<uint8_t> values;
 	std::vector<TrainingNumber> trainingNums;
 
+	std::vector<DataPoint*> trainingData;
+
 	std::unique_ptr<DataPoint> currentData;
+
+	NeuralNetwork* network;
 
 	int currentImage;
 };

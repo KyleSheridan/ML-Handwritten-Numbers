@@ -20,7 +20,9 @@ public:
 
     int IndexOfMaxValue(std::vector<double> arr);
 
-    double Cost(std::vector<DataPoint> data);
+    double Cost(std::vector<DataPoint*> data);
+
+    void Learn(std::vector<DataPoint*> trainingData, double learnRate);
 
 private:
     double Cost(DataPoint* dataPoint);

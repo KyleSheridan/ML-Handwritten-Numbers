@@ -10,8 +10,16 @@ public:
 		numNodesIn = _numNodesIn;
 		numNodesOut = _numNodesOut;
 
-		weights.reserve(numNodesIn);
-		biases.reserve(numNodesOut);
+		std::vector<double> temp;
+
+		temp.resize(numNodesOut, 0.0);
+
+		costGradientW.resize(numNodesIn, temp);
+		weights.resize(numNodesIn, temp);
+		costGradientB.resize(numNodesOut, 0.0);
+		biases.resize(numNodesOut, 0.0);
+
+		InitializeRandomWeights();
 	}
 
 	std::vector<double> CalculateOutputs(std::vector<double> inputs);
@@ -22,7 +30,7 @@ private:
 	double ActivationFunction(double weightedInput);
 	void InitializeRandomWeights();
 
-private:
+public:
 	int numNodesIn, numNodesOut;
 	std::vector<std::vector<double>> costGradientW;
 	std::vector<double> costGradientB;

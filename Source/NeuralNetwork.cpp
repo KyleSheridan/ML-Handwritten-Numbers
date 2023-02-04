@@ -53,14 +53,47 @@ double NeuralNetwork::Cost(DataPoint* dataPoint)
 	return cost;
 }
 
-double NeuralNetwork::Cost(std::vector<DataPoint> data)
+double NeuralNetwork::Cost(std::vector<DataPoint*> data)
 {
 	double totalCost = 0;
 
-	for(DataPoint dataPoint : data)
+	for(DataPoint* dataPoint : data)
 	{
-		totalCost += Cost(&dataPoint);
+		totalCost += Cost(dataPoint);
 	}
 
 	return totalCost / data.size();
+}
+
+void NeuralNetwork::Learn(std::vector<DataPoint*> trainingData, double learnRate)
+{
+	const double h = 0.0001;
+	double originalCost = Cost(trainingData);
+
+	for (Layer layer : layers) 
+	{
+		for (int nodeIn = 0; nodeIn < layer.numNodesIn; nodeIn++)
+		{
+			for (int nodeOut = 0; nodeOut < layer.numNodesOut; nodeOut++)
+			{
+				layer.weights[nodeIn][nodeOut] += h;
+				double deltaCost = Cost(trainingData) - originalCost;
+				layer.weights[nodeIn][nodeOut] -= h;
+				layer.costGradientW[nodeIn][nodeOut] = deltaCost / h;
+			}
+		}
+
+		for (int biasIndex = 0; biasIndex < layer.biases.size(); biasIndex++)
+		{
+			layer.biases[biasIndex] += h;
+			double deltaCost = Cost(trainingData) - originalCost;
+			layer.biases[biasIndex] -= h;
+			layer.costGradientB[biasIndex] = deltaCost / h;
+		}
+	}
+
+	for (Layer layer : layers) 
+	{
+		layer.ApplyGradients(learnRate);
+	}
 }
