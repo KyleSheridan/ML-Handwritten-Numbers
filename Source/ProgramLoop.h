@@ -68,6 +68,8 @@ public:
 	bool input();
 	void draw();
 
+	void MiniBatch(int startIndex, int amount, double learnRate);
+
 	template<typename T, typename H, typename C>
 	void ReadFile(const char* filename, std::vector<T>* vec, H header, C object);
 

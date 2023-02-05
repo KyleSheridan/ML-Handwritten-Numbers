@@ -70,6 +70,8 @@ void NeuralNetwork::Learn(std::vector<DataPoint*> trainingData, double learnRate
 	const double h = 0.0001;
 	double originalCost = Cost(trainingData);
 
+	std::cout << originalCost << "\n";
+
 	for (Layer layer : layers) 
 	{
 		for (int nodeIn = 0; nodeIn < layer.numNodesIn; nodeIn++)
