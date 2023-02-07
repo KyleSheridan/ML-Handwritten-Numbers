@@ -28,19 +28,8 @@ bool ProgramLoop::init()
 
 	for (int i = 0; i < 100; i++)
 	{
-		MiniBatch((i * 30), 30, 0.05);
+		MiniBatch((i * 100), 100, 0.05);
 	}
-
-	/*MiniBatch(0, 100, 0.26);
-	MiniBatch(100, 100, 0.26);
-	MiniBatch(200, 100, 0.26);
-	MiniBatch(300, 100, 0.26);
-	MiniBatch(400, 100, 0.26);
-	MiniBatch(500, 100, 0.26);
-	MiniBatch(600, 100, 0.26);
-	MiniBatch(700, 100, 0.26);
-	MiniBatch(800, 100, 0.26);
-	MiniBatch(900, 100, 0.26);*/
 
 	std::cout << (int)*trainingNums[currentImage].value << "\n";
 

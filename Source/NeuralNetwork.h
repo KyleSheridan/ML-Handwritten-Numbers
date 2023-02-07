@@ -11,12 +11,15 @@ public:
         layers.reserve(arrSize);
         for (int i = 0; i < arrSize; i++)
         {
-            layers.emplace_back(Layer(layerSizes[i], layerSizes[i + 1]));
+            layers.emplace_back(new Layer(layerSizes[i], layerSizes[i + 1]));
         }
     }
 
     std::vector<double> CalculateOutputs(std::vector<double> inputs);
     int Classify(std::vector<double> inputs);
+    void UpdateAllGradients(DataPoint* dataPoint);
+    void ApplyAllGradients(double learnRate);
+    void ClearAllGradients();
 
     int IndexOfMaxValue(std::vector<double> arr);
 
@@ -27,5 +30,5 @@ public:
 private:
     double Cost(DataPoint* dataPoint);
 
-    std::vector<Layer> layers;
+    std::vector<Layer*> layers;
 };
