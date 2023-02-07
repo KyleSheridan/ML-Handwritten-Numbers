@@ -11,7 +11,7 @@ std::vector<double> Layer::CalculateOutputs(std::vector<double> inputs)
 		{
 			weightedInput += inputs[nodeIn] * weights[nodeIn][nodeOut];
 		}
-		weightedInputs[nodeOut] = ActivationFunction(weightedInput);
+		weightedInputs[nodeOut] = weightedInput;
 	}
 
 	for (int outputNode = 0; outputNode < activations.size(); outputNode++)
@@ -41,7 +41,7 @@ void Layer::ApplyGradients(double learnRate)
 
 		for (int nodeIn = 0; nodeIn < numNodesIn; nodeIn++)
 		{
-			weights[nodeIn][nodeOut] = costGradientW[nodeIn][nodeOut] * learnRate;
+			weights[nodeIn][nodeOut] -= costGradientW[nodeIn][nodeOut] * learnRate;
 		}
 	}
 }

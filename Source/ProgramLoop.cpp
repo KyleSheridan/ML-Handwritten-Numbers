@@ -7,31 +7,51 @@ bool ProgramLoop::init()
 		return false;
 	}
 
-	ReadFile("../DataSets/train-images.idx3-ubyte", &images, IDX3_Header{}, Number{});
-	ReadFile("../DataSets/train-labels.idx1-ubyte", &values, IDX1_Header{}, uint8_t{});
+	ReadFile("../DataSets/train-images.idx3-ubyte", &trainingImages, IDX3_Header{}, Number{});
+	ReadFile("../DataSets/train-labels.idx1-ubyte", &trainingValues, IDX1_Header{}, uint8_t{});
+	ReadFile("../DataSets/t10k-images.idx3-ubyte", &testingImages, IDX3_Header{}, Number{});
+	ReadFile("../DataSets/t10k-labels.idx1-ubyte", &testingValues, IDX1_Header{}, uint8_t{});
 
-	trainingNums.reserve(images.size());
-	trainingData.reserve(images.size());
+	trainingData.reserve(trainingImages.size());
+	testingData.reserve(testingImages.size());
 
-	for (int i = 0; i < images.size(); i++)
+	for (int i = 0; i < trainingImages.size(); i++)
 	{
-		trainingNums.emplace_back(TrainingNumber(&images[i], &values[i]));
-
-		trainingData.emplace_back(new DataPoint(&trainingNums[i]));
+		trainingData.emplace_back(new DataPoint(&trainingImages[i], trainingValues[i]));
+	}
+	
+	for (int i = 0; i < testingImages.size(); i++)
+	{
+		testingData.emplace_back(new DataPoint(&testingImages[i], testingValues[i]));
 	}
 
-	currentData = std::make_unique<DataPoint>(&trainingNums[currentImage]);
-
-	std::vector<int> layers = { 784, 100, 10 };
+	std::vector<int> layers = { 784, 100, 100, 10 };
 
 	network = new NeuralNetwork(layers);
 
+	std::cout << std::endl;
+
+	int percent = 0;
+
 	for (int i = 0; i < 100; i++)
 	{
-		MiniBatch((i * 100), 100, 0.05);
+		if (i % 6 == 0) {
+			std::cout << "\rNetwork Learning: " << percent << "%";
+			percent++;
+		}
+
+		MiniBatch((i * 100), 100, 1);
 	}
 
-	std::cout << (int)*trainingNums[currentImage].value << "\n";
+	std::cout << std::endl;
+
+	std::vector<double> outputs = network->CalculateOutputs(testingData[currentImage]->inputs);
+
+	for (double val : outputs) {
+		std::cout << val << "\n";
+	}
+
+	//std::cout << network->TestNumber(testingData[currentImage]) << "\n";
 
 	return true;
 }
@@ -49,9 +69,11 @@ bool ProgramLoop::input()
 				break;
 			case SDLK_TAB:
 				currentImage++;
-				std::cout << (int)*trainingNums[currentImage].value << "\n";
+				//std::cout << (int)*trainingNums[currentImage].value << "\n";
+				//std::cout << network->TestNumber(testingData[currentImage]) << "\n";
 
-				currentData = std::make_unique<DataPoint>(&trainingNums[currentImage]);
+				PrintOutputs();
+				
 				break;
 			default:
 				break;
@@ -74,7 +96,7 @@ bool ProgramLoop::input()
 
 void ProgramLoop::draw()
 {
-	Renderer::RenderNumber(trainingNums[currentImage].image);
+	Renderer::RenderNumber(&testingImages[currentImage]);
 
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), Renderer::GetScreen());
 	if (texture == nullptr) {
@@ -94,6 +116,17 @@ void ProgramLoop::MiniBatch(int startIndex, int size, double learnRate)
 	std::vector<DataPoint*>::const_iterator last = first + size;
 
 	network->Learn({ first, last }, learnRate);
+}
+
+void ProgramLoop::PrintOutputs()
+{
+	std::vector<double> outputs = network->CalculateOutputs(testingData[currentImage]->inputs);
+
+	for (int i = 0; i < outputs.size(); i++) {
+		std::cout << i << ": " << outputs[i] << "\n";
+	}
+
+	std::cout << std::endl;
 }
 
 template<typename T, typename H, typename C>

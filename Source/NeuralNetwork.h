@@ -21,6 +21,8 @@ public:
     void ApplyAllGradients(double learnRate);
     void ClearAllGradients();
 
+    int TestNumber(DataPoint* dataPoint);
+
     int IndexOfMaxValue(std::vector<double> arr);
 
     double Cost(std::vector<DataPoint*> data);

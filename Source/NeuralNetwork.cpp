@@ -54,6 +54,24 @@ void NeuralNetwork::ClearAllGradients()
 	}
 }
 
+int NeuralNetwork::TestNumber(DataPoint* dataPoint)
+{
+	std::vector<double> outputs = CalculateOutputs(dataPoint->inputs);
+
+	int largest = -1;
+	int index = 0;
+
+	for (int i = 0; i < outputs.size(); i++)
+	{
+		if (outputs[i] > largest) {
+			largest = outputs[i];
+			index = i;
+		}
+	}
+
+	return index;
+}
+
 int NeuralNetwork::IndexOfMaxValue(std::vector<double> arr)
 {
 	int index = -1;
@@ -99,6 +117,8 @@ double NeuralNetwork::Cost(std::vector<DataPoint*> data)
 
 void NeuralNetwork::Learn(std::vector<DataPoint*> trainingData, double learnRate)
 {
+	std::cout << Cost(trainingData) << std::endl;
+
 	for (DataPoint* dataPoint : trainingData) {
 		UpdateAllGradients(dataPoint);
 	}

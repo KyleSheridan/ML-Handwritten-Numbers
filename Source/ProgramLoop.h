@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <vector>
 #include <SDL.h>
@@ -70,19 +71,22 @@ public:
 
 	void MiniBatch(int startIndex, int amount, double learnRate);
 
+	void PrintOutputs();
+
 	template<typename T, typename H, typename C>
 	void ReadFile(const char* filename, std::vector<T>* vec, H header, C object);
 
 private:
 	SDL_Event e;
 
-	std::vector<Number> images;
-	std::vector<uint8_t> values;
-	std::vector<TrainingNumber> trainingNums;
+	std::vector<Number> trainingImages;
+	std::vector<uint8_t> trainingValues;
+
+	std::vector<Number> testingImages;
+	std::vector<uint8_t> testingValues;
 
 	std::vector<DataPoint*> trainingData;
-
-	std::unique_ptr<DataPoint> currentData;
+	std::vector<DataPoint*> testingData;
 
 	NeuralNetwork* network;
 
