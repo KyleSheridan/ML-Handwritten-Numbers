@@ -1,8 +1,10 @@
 #pragma once
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <algorithm>
 #include <SDL.h>
 
 #include "Renderer.h"

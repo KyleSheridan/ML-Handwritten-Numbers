@@ -25,7 +25,7 @@ bool ProgramLoop::init()
 		testingData.emplace_back(new DataPoint(&testingImages[i], testingValues[i]));
 	}
 
-	std::vector<int> layers = { 784, 100, 10 };
+	std::vector<int> layers = { 784, 784, 10 };
 
 	network = new NeuralNetwork(layers);
 
@@ -36,7 +36,8 @@ bool ProgramLoop::init()
 	for (int i = 0; i < 600; i++)
 	{
 		if (i % 6 == 0) {
-			std::cout << "\rNetwork Learning: " << percent << "%";
+			//std::cout << "\rNetwork Learning: " << percent << "%";
+			std::cout << "Network Learning: " << percent << "%\n";
 			percent++;
 		}
 
@@ -122,8 +123,18 @@ void ProgramLoop::PrintOutputs()
 {
 	std::vector<double> outputs = network->CalculateOutputs(testingData[currentImage]->inputs);
 
+	std::cout << std::setprecision(3);
+
+	double total = 0.0;
+
 	for (int i = 0; i < outputs.size(); i++) {
-		std::cout << i << ": " << outputs[i] << "\n";
+		outputs[i] = round(outputs[i] * 100) / 100;
+
+		total += outputs[i];
+	}
+
+	for (int i = 0; i < outputs.size(); i++) {
+		std::cout << i << ": " << (outputs[i] / total) * 100 << "%\n";
 	}
 
 	std::cout << std::endl;
