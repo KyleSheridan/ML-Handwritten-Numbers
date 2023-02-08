@@ -3,6 +3,7 @@
 #include <time.h>
 #include <vector>
 #include <cmath>
+#include <math.h>
 
 class Layer {
 public:
@@ -26,8 +27,13 @@ public:
 	}
 
 	std::vector<double> CalculateOutputs(std::vector<double> inputs);
+
 	double NodeCost(double outputActivation, double expectedOutput);
 	double NodeCostDerivative(double outputActivation, double expectedOutput);
+	double CrossEntopy(double outputActivation, double expectedOutput);
+	double CrossEntopyDerivative(double outputActivation, double expectedOutput);
+
+
 	void ApplyGradients(double learnRate);
 	void UpdateGradients(std::vector<double> nodeValues);
 	void ClearGradients();

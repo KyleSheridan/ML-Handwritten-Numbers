@@ -39,7 +39,7 @@ public:
 		{
 			for (short j = 0; j < 28; j++)
 			{
-				inputs.emplace_back(number->pixels[i][j]);
+				inputs.emplace_back((double)number->pixels[i][j] / 255.0);
 			}
 		}
 

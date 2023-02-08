@@ -97,7 +97,7 @@ double NeuralNetwork::Cost(DataPoint* dataPoint)
 
 	for (int nodeOut = 0; nodeOut < outputs.size(); nodeOut++)
 	{
-		cost += outputLayer->NodeCost(outputs[nodeOut], dataPoint->expectedOutputs[nodeOut]);
+		cost += outputLayer->CrossEntopy(outputs[nodeOut], dataPoint->expectedOutputs[nodeOut]);
 	}
 
 	return cost;

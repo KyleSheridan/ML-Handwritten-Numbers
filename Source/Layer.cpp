@@ -33,6 +33,20 @@ double Layer::NodeCostDerivative(double outputActivation, double expectedOutput)
 	return 2 * (outputActivation - expectedOutput);
 }
 
+double Layer::CrossEntopy(double outputActivation, double expectedOutput)
+{
+	double v = (expectedOutput == 1) ? -log(outputActivation) : -log(1 - outputActivation);
+	return v;
+}
+
+double Layer::CrossEntopyDerivative(double outputActivation, double expectedOutput)
+{
+	if (outputActivation == 0 || outputActivation == 1) {
+		return 0;
+	}
+	return (expectedOutput - outputActivation) / (outputActivation * (outputActivation - 1));
+}
+
 void Layer::ApplyGradients(double learnRate)
 {
 	for (int nodeOut = 0; nodeOut < numNodesOut; nodeOut++)
@@ -84,7 +98,8 @@ std::vector<double> Layer::CalculateOutputLayerNodeValues(std::vector<double> ex
 
 	for (int i = 0; i < expectedOutputs.size(); i++)
 	{
-		double costDerivative = NodeCostDerivative(activations[i], expectedOutputs[i]);
+		//double costDerivative = NodeCostDerivative(activations[i], expectedOutputs[i]);
+		double costDerivative = CrossEntopyDerivative(activations[i], expectedOutputs[i]);
 		double activationDerivative = ActivationDerivative(weightedInputs[i]);
 		nodeValues.emplace_back(activationDerivative * costDerivative);
 	}
