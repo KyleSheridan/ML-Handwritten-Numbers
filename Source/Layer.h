@@ -4,35 +4,16 @@
 #include <vector>
 #include <cmath>
 #include <math.h>
+#include <functional>
+
+#include "Cost.h"
+#include "Activation.h"
 
 class Layer {
 public:
-	Layer(int _numNodesIn, int _numNodesOut) {
-		numNodesIn = _numNodesIn;
-		numNodesOut = _numNodesOut;
-
-		std::vector<double> temp;
-
-		temp.resize(numNodesOut, 0.0);
-
-		costGradientW.resize(numNodesIn, temp);
-		weights.resize(numNodesIn, temp);
-		costGradientB.resize(numNodesOut, 0.0);
-		biases.resize(numNodesOut, 0.0);
-
-		weightedInputs.resize(numNodesOut, 0.0);
-		activations.resize(numNodesOut, 0.0);
-
-		InitializeRandomWeights();
-	}
+	Layer(int _numNodesIn, int _numNodesOut, CostFunctionType costFunction, ActivationFunctionType activationFunction);
 
 	std::vector<double> CalculateOutputs(std::vector<double> inputs);
-
-	double NodeCost(double outputActivation, double expectedOutput);
-	double NodeCostDerivative(double outputActivation, double expectedOutput);
-	double CrossEntopy(double outputActivation, double expectedOutput);
-	double CrossEntopyDerivative(double outputActivation, double expectedOutput);
-
 
 	void ApplyGradients(double learnRate);
 	void UpdateGradients(std::vector<double> nodeValues);
@@ -42,8 +23,6 @@ public:
 	std::vector<double> CalculateHiddenLayerNodeValues(Layer* oldLayer, std::vector<double> oldNodeValues);
 
 private:
-	double ActivationFunction(double weightedInput);
-	double ActivationDerivative(double weightedInput);
 	void InitializeRandomWeights();
 
 public:
@@ -56,4 +35,7 @@ public:
 	std::vector<double> inputValues;
 	std::vector<double> weightedInputs;
 	std::vector<double> activations;
+
+	Cost* cost;
+	Activation* activation;
 };

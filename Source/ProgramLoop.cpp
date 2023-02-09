@@ -31,28 +31,11 @@ bool ProgramLoop::init()
 
 	std::cout << std::endl;
 
-	int percent = 0;
-
-	for (int i = 0; i < 600; i++)
-	{
-		if (i % 6 == 0) {
-			//std::cout << "\rNetwork Learning: " << percent << "%";
-			std::cout << "Network Learning: " << percent << "%\n";
-			percent++;
-		}
-
-		MiniBatch((i * 100), 100, 0.05);
-	}
+	network->BatchLearn(trainingData, testingData, 0.05, 100);
 
 	std::cout << std::endl;
 
-	std::vector<double> outputs = network->CalculateOutputs(testingData[currentImage]->inputs);
-
-	for (double val : outputs) {
-		std::cout << val << "\n";
-	}
-
-	//std::cout << network->TestNumber(testingData[currentImage]) << "\n";
+	network->PrintOutputs(testingData[currentImage]->inputs);
 
 	return true;
 }
@@ -70,10 +53,8 @@ bool ProgramLoop::input()
 				break;
 			case SDLK_TAB:
 				currentImage++;
-				//std::cout << (int)*trainingNums[currentImage].value << "\n";
-				//std::cout << network->TestNumber(testingData[currentImage]) << "\n";
 
-				PrintOutputs();
+				network->PrintOutputs(testingData[currentImage]->inputs);
 				
 				break;
 			default:
@@ -109,35 +90,6 @@ void ProgramLoop::draw()
 	SDL_RenderPresent(Renderer::GetRenderer());
 
 	SDL_DestroyTexture(texture);
-}
-
-void ProgramLoop::MiniBatch(int startIndex, int size, double learnRate)
-{
-	std::vector<DataPoint*>::const_iterator first = trainingData.begin() + startIndex;
-	std::vector<DataPoint*>::const_iterator last = first + size;
-
-	network->Learn({ first, last }, learnRate);
-}
-
-void ProgramLoop::PrintOutputs()
-{
-	std::vector<double> outputs = network->CalculateOutputs(testingData[currentImage]->inputs);
-
-	std::cout << std::setprecision(3);
-
-	double total = 0.0;
-
-	for (int i = 0; i < outputs.size(); i++) {
-		outputs[i] = round(outputs[i] * 100) / 100;
-
-		total += outputs[i];
-	}
-
-	for (int i = 0; i < outputs.size(); i++) {
-		std::cout << i << ": " << (outputs[i] / total) * 100 << "%\n";
-	}
-
-	std::cout << std::endl;
 }
 
 template<typename T, typename H, typename C>

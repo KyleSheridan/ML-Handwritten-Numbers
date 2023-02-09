@@ -1,5 +1,46 @@
 #include "Layer.h"
 
+Layer::Layer(int _numNodesIn, int _numNodesOut, CostFunctionType costFunction, ActivationFunctionType activationFunction)
+{
+	numNodesIn = _numNodesIn;
+	numNodesOut = _numNodesOut;
+
+	std::vector<double> temp;
+
+	temp.resize(numNodesOut, 0.0);
+
+	costGradientW.resize(numNodesIn, temp);
+	weights.resize(numNodesIn, temp);
+	costGradientB.resize(numNodesOut, 0.0);
+	biases.resize(numNodesOut, 0.0);
+
+	weightedInputs.resize(numNodesOut, 0.0);
+	activations.resize(numNodesOut, 0.0);
+
+	switch (costFunction)
+	{
+	case CostFunctionType::MEAN_SQUARE:
+		cost = new MeanSquare();
+		break;
+	case CostFunctionType::CROSS_ENTORPY:
+		cost = new CrossEntropy();
+		break;
+	default:
+		break;
+	}
+
+	switch (activationFunction)
+	{
+	case ActivationFunctionType::SIGMOID:
+		activation = new Sigmoid();
+		break;
+	default:
+		break;
+	}
+
+	InitializeRandomWeights();
+}
+
 std::vector<double> Layer::CalculateOutputs(std::vector<double> inputs)
 {
 	inputValues = std::vector<double>(inputs);
@@ -16,35 +57,10 @@ std::vector<double> Layer::CalculateOutputs(std::vector<double> inputs)
 
 	for (int outputNode = 0; outputNode < activations.size(); outputNode++)
 	{
-		activations[outputNode] = ActivationFunction(weightedInputs[outputNode]);
+		activations[outputNode] = activation->ActivationFunction(weightedInputs[outputNode]);
 	}
 
 	return activations;
-}
-
-double Layer::NodeCost(double outputActivation, double expectedOutput)
-{
-	double error = outputActivation - expectedOutput;
-	return error * error;
-}
-
-double Layer::NodeCostDerivative(double outputActivation, double expectedOutput)
-{
-	return 2 * (outputActivation - expectedOutput);
-}
-
-double Layer::CrossEntopy(double outputActivation, double expectedOutput)
-{
-	double v = (expectedOutput == 1) ? -log(outputActivation) : -log(1 - outputActivation);
-	return v;
-}
-
-double Layer::CrossEntopyDerivative(double outputActivation, double expectedOutput)
-{
-	if (outputActivation == 0 || outputActivation == 1) {
-		return 0;
-	}
-	return (expectedOutput - outputActivation) / (outputActivation * (outputActivation - 1));
 }
 
 void Layer::ApplyGradients(double learnRate)
@@ -99,8 +115,8 @@ std::vector<double> Layer::CalculateOutputLayerNodeValues(std::vector<double> ex
 	for (int i = 0; i < expectedOutputs.size(); i++)
 	{
 		//double costDerivative = NodeCostDerivative(activations[i], expectedOutputs[i]);
-		double costDerivative = CrossEntopyDerivative(activations[i], expectedOutputs[i]);
-		double activationDerivative = ActivationDerivative(weightedInputs[i]);
+		double costDerivative = cost->CostDerivative(activations[i], expectedOutputs[i]);
+		double activationDerivative = activation->ActivationFunctionDerivative(weightedInputs[i]);
 		nodeValues.emplace_back(activationDerivative * costDerivative);
 	}
 
@@ -121,22 +137,11 @@ std::vector<double> Layer::CalculateHiddenLayerNodeValues(Layer* oldLayer, std::
 			newNodeValue += weightedInputDerivative * oldNodeValues[oldNodeIndex];
 		}
 
-		newNodeValue *= ActivationDerivative(weightedInputs[newNodeIndex]);
+		newNodeValue *= activation->ActivationFunctionDerivative(weightedInputs[newNodeIndex]);
 		newNodeValues.emplace_back(newNodeValue);
 	}
 
 	return newNodeValues;
-}
-
-double Layer::ActivationFunction(double weightedInput)
-{
-	return 1 / (1 + std::exp(-weightedInput));
-}
-
-double Layer::ActivationDerivative(double weightedInput)
-{
-	double activation = ActivationFunction(weightedInput);
-	return activation * (1 - activation);
 }
 
 void Layer::InitializeRandomWeights()

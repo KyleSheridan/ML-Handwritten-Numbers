@@ -97,10 +97,26 @@ double NeuralNetwork::Cost(DataPoint* dataPoint)
 
 	for (int nodeOut = 0; nodeOut < outputs.size(); nodeOut++)
 	{
-		cost += outputLayer->CrossEntopy(outputs[nodeOut], dataPoint->expectedOutputs[nodeOut]);
+		cost += outputLayer->cost->CostFunction(outputs[nodeOut], dataPoint->expectedOutputs[nodeOut]);
 	}
 
 	return cost;
+}
+
+int NeuralNetwork::LargestOutput(std::vector<double> outputs)
+{
+	double largest = DBL_MIN;
+	int result = -1;
+
+	for (int i = 0; i < outputs.size(); i++)
+	{
+		if (outputs[i] > largest) {
+			largest = outputs[i];
+			result = i;
+		}
+	}
+
+	return result;
 }
 
 double NeuralNetwork::Cost(std::vector<DataPoint*> data)
@@ -117,8 +133,6 @@ double NeuralNetwork::Cost(std::vector<DataPoint*> data)
 
 void NeuralNetwork::Learn(std::vector<DataPoint*> trainingData, double learnRate)
 {
-	std::cout << Cost(trainingData) << std::endl;
-
 	for (DataPoint* dataPoint : trainingData) {
 		UpdateAllGradients(dataPoint);
 	}
@@ -128,39 +142,91 @@ void NeuralNetwork::Learn(std::vector<DataPoint*> trainingData, double learnRate
 	ClearAllGradients();
 }
 
-/*
-void NeuralNetwork::Learn(std::vector<DataPoint*> trainingData, double learnRate)
+double NeuralNetwork::Test(std::vector<DataPoint*> testingData)
 {
-	const double h = 0.0001;
-	double originalCost = Cost(trainingData);
+	int numCorrect = 0;
 
-	std::cout << originalCost << "\n";
+	for (DataPoint* test : testingData) {
+		std::vector<double> outputs = CalculateOutputs(test->inputs);
 
-	for (Layer layer : layers) 
-	{
-		for (int nodeIn = 0; nodeIn < layer.numNodesIn; nodeIn++)
-		{
-			for (int nodeOut = 0; nodeOut < layer.numNodesOut; nodeOut++)
-			{
-				layer.weights[nodeIn][nodeOut] += h;
-				double deltaCost = Cost(trainingData) - originalCost;
-				layer.weights[nodeIn][nodeOut] -= h;
-				layer.costGradientW[nodeIn][nodeOut] = deltaCost / h;
-			}
-		}
-
-		for (int biasIndex = 0; biasIndex < layer.biases.size(); biasIndex++)
-		{
-			layer.biases[biasIndex] += h;
-			double deltaCost = Cost(trainingData) - originalCost;
-			layer.biases[biasIndex] -= h;
-			layer.costGradientB[biasIndex] = deltaCost / h;
+		if (test->expectedOutputs[LargestOutput(outputs)] == 1.0) {
+			numCorrect++;
 		}
 	}
 
-	for (Layer layer : layers) 
-	{
-		layer.ApplyGradients(learnRate);
-	}
+	double percentCorrect = (double)numCorrect / (double)testingData.size();
+
+	return round(percentCorrect * 10000) / 100;
 }
-*/
+
+void NeuralNetwork::BatchLearn(std::vector<DataPoint*> trainingData, double learnRate, int batchSize)
+{
+	int NumBatches = trainingData.size() / batchSize;
+
+	int percent = 0;
+
+	for (int i = 0; i < NumBatches; i++)
+	{
+		if (i % (NumBatches / 100) == 0) {
+			std::cout << "\rNetwork Learning: " << percent << "%";
+			percent++;
+		}
+
+		MiniBatch(trainingData, (i * batchSize), batchSize, learnRate);
+	}
+
+	std::cout << "\rLearning Complete!\n";
+}
+
+void NeuralNetwork::BatchLearn(std::vector<DataPoint*> trainingData, std::vector<DataPoint*> testingData, double learnRate, int batchSize)
+{
+	int NumBatches = trainingData.size() / batchSize;
+
+	int percent = 0;
+	std::random_device rd;
+	std::mt19937 g(rd());
+
+	for (int i = 0; i < NumBatches; i++)
+	{
+		if (i % (NumBatches / 100) == 0) {
+			percent++;
+		}
+
+		MiniBatch(trainingData, (i * batchSize), batchSize, learnRate);
+
+		std::shuffle(testingData.begin(), testingData.end(), g);
+		std::vector<DataPoint*> testBatch(testingData.begin(), testingData.begin() + 200);
+		std::cout << "\rNetwork Learning: " << percent << "%  Success rate: " << Test(testBatch) << "%";
+	}
+
+	std::cout << "\rLearning Complete! \nFinal Success Rate: " << Test(testingData) << "%\n";
+}
+
+void NeuralNetwork::MiniBatch(std::vector<DataPoint*> trainingData, int startIndex, int batchSize, double learnRate)
+{
+	std::vector<DataPoint*>::const_iterator first = trainingData.begin() + startIndex;
+	std::vector<DataPoint*>::const_iterator last = first + batchSize;
+
+	Learn({ first, last }, learnRate);
+}
+
+void NeuralNetwork::PrintOutputs(std::vector<double> inputs)
+{
+	std::vector<double> outputs = CalculateOutputs(inputs);
+
+	std::cout << std::setprecision(3);
+
+	double total = 0.0;
+
+	for (int i = 0; i < outputs.size(); i++) {
+		outputs[i] = round(outputs[i] * 100) / 100;
+
+		total += outputs[i];
+	}
+
+	for (int i = 0; i < outputs.size(); i++) {
+		std::cout << i << ": " << (outputs[i] / total) * 100 << "%\n";
+	}
+
+	std::cout << std::endl;
+}
