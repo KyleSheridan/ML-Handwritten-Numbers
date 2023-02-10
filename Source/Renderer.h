@@ -5,7 +5,6 @@
 #include "Number.h"
 
 namespace Renderer {
-
 	bool InitializeRenderer();
 	void UninitalizeRenderer();
 

@@ -7,15 +7,35 @@ bool ProgramLoop::init()
 		return false;
 	}
 
-	ReadFile("../DataSets/train-images.idx3-ubyte", &images, IDX3_Header{}, Number{});
-	ReadFile("../DataSets/train-labels.idx1-ubyte", &values, IDX1_Header{}, uint8_t{});
+	ReadFile("../DataSets/train-images.idx3-ubyte", &trainingImages, IDX3_Header{}, Number{});
+	ReadFile("../DataSets/train-labels.idx1-ubyte", &trainingValues, IDX1_Header{}, uint8_t{});
+	ReadFile("../DataSets/t10k-images.idx3-ubyte", &testingImages, IDX3_Header{}, Number{});
+	ReadFile("../DataSets/t10k-labels.idx1-ubyte", &testingValues, IDX1_Header{}, uint8_t{});
 
-	for (int i = 0; i < images.size(); i++)
+	trainingData.reserve(trainingImages.size());
+	testingData.reserve(testingImages.size());
+
+	for (int i = 0; i < trainingImages.size(); i++)
 	{
-		trainingNums.push_back(TrainingNumber(&images[i], &values[i]));
+		trainingData.emplace_back(new DataPoint(&trainingImages[i], trainingValues[i]));
+	}
+	
+	for (int i = 0; i < testingImages.size(); i++)
+	{
+		testingData.emplace_back(new DataPoint(&testingImages[i], testingValues[i]));
 	}
 
-	std::cout << (int)*trainingNums[currentImage].value << "\n";
+	std::vector<int> layers = { 784, 784, 10 };
+
+	network = new NeuralNetwork(layers);
+
+	std::cout << std::endl;
+
+	network->BatchLearn(trainingData, testingData, 0.05, 100);
+
+	std::cout << std::endl;
+
+	network->PrintOutputs(testingData[currentImage]->inputs);
 
 	return true;
 }
@@ -33,11 +53,14 @@ bool ProgramLoop::input()
 				break;
 			case SDLK_TAB:
 				currentImage++;
-				std::cout << (int)*trainingNums[currentImage].value << "\n";
+
+				network->PrintOutputs(testingData[currentImage]->inputs);
+
 				break;
 			default:
 				break;
 			}
+			break;
 		case SDL_WINDOWEVENT:
 			switch (e.window.event)
 			{
@@ -46,6 +69,7 @@ bool ProgramLoop::input()
 			default:
 				break;
 			}
+			break;
 		}
 	}
 
@@ -54,7 +78,7 @@ bool ProgramLoop::input()
 
 void ProgramLoop::draw()
 {
-	Renderer::RenderNumber(trainingNums[currentImage].image);
+	Renderer::RenderNumber(&testingImages[currentImage]);
 
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), Renderer::GetScreen());
 	if (texture == nullptr) {

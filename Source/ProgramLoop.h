@@ -1,10 +1,14 @@
 #pragma once
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <vector>
+#include <algorithm>
 #include <SDL.h>
 
 #include "Renderer.h"
+#include "DataPoint.h"
+#include "NeuralNetwork.h"
 
 struct IDX3_Header {
 	int32_t magicNumber = 0;
@@ -72,9 +76,16 @@ public:
 private:
 	SDL_Event e;
 
-	std::vector<Number> images;
-	std::vector<uint8_t> values;
-	std::vector<TrainingNumber> trainingNums;
+	std::vector<Number> trainingImages;
+	std::vector<uint8_t> trainingValues;
+
+	std::vector<Number> testingImages;
+	std::vector<uint8_t> testingValues;
+
+	std::vector<DataPoint*> trainingData;
+	std::vector<DataPoint*> testingData;
+
+	NeuralNetwork* network;
 
 	int currentImage;
 };
