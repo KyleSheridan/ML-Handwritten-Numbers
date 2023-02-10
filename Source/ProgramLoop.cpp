@@ -55,7 +55,7 @@ bool ProgramLoop::input()
 				currentImage++;
 
 				network->PrintOutputs(testingData[currentImage]->inputs);
-				
+
 				break;
 			default:
 				break;
