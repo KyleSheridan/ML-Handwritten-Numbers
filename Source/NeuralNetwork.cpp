@@ -182,10 +182,11 @@ void NeuralNetwork::BatchLearn(std::vector<DataPoint*> trainingData, std::vector
 {
 	int NumBatches = trainingData.size() / batchSize;
 
-	int percent = 0;
+	int percent = -1;
 	std::random_device rd;
 	std::mt19937 g(rd());
 
+	std::string learingLine;
 	for (int i = 0; i < NumBatches; i++)
 	{
 		if (i % (NumBatches / 100) == 0) {
@@ -196,10 +197,18 @@ void NeuralNetwork::BatchLearn(std::vector<DataPoint*> trainingData, std::vector
 
 		std::shuffle(testingData.begin(), testingData.end(), g);
 		std::vector<DataPoint*> testBatch(testingData.begin(), testingData.begin() + 200);
-		std::cout << "\rNetwork Learning: " << percent << "%  Success rate: " << Test(testBatch) << "%";
+		
+		std::string testResult = HelperFunctions::DoubleToStringWithPrecision(Test(testBatch));
+
+		std::cout << '\r' << std::string(learingLine.length(), ' ') << '\r';
+		learingLine = "Network Learning: " + std::to_string(percent) + "%  Success rate: " + testResult + "%";
+		std::cout << '\r' << learingLine;
 	}
 
-	std::cout << "\rLearning Complete! \nFinal Success Rate: " << Test(testingData) << "%\n";
+	std::string finalTestResult = HelperFunctions::DoubleToStringWithPrecision(Test(testingData));
+
+	std::cout << '\r' << std::string(learingLine.length(), ' ') << '\r';
+	std::cout << "Learning Complete! \nFinal Success Rate: " << finalTestResult << "%\n";
 }
 
 void NeuralNetwork::MiniBatch(std::vector<DataPoint*> trainingData, int startIndex, int batchSize, double learnRate)
@@ -214,8 +223,6 @@ void NeuralNetwork::PrintOutputs(std::vector<double> inputs)
 {
 	std::vector<double> outputs = CalculateOutputs(inputs);
 
-	std::cout << std::setprecision(3);
-
 	double total = 0.0;
 
 	for (int i = 0; i < outputs.size(); i++) {
@@ -225,7 +232,9 @@ void NeuralNetwork::PrintOutputs(std::vector<double> inputs)
 	}
 
 	for (int i = 0; i < outputs.size(); i++) {
-		std::cout << i << ": " << (outputs[i] / total) * 100 << "%\n";
+		std::string percent = HelperFunctions::DoubleToStringWithPrecision((outputs[i] / total) * 100);
+
+		std::cout << i << ": " << percent << "%\n";
 	}
 
 	std::cout << std::endl;

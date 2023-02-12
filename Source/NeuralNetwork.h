@@ -1,11 +1,14 @@
 #pragma once
-#include<iomanip>
+#include <iomanip>
+#include <sstream>
 #include <algorithm>
 #include <random>
+#include <string>
 #include <float.h>
 
 #include "Layer.h";
 #include "DataPoint.h"
+#include "HelperFunctions.h"
 
 class NeuralNetwork {
 public:
