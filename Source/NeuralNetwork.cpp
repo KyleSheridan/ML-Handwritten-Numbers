@@ -28,22 +28,34 @@ void NeuralNetwork::UpdateAllGradients(DataPoint* dataPoint)
 
 	// Update gradients of the output layer
 	Layer* outputLayer = layers[layers.size() - 1];
-	std::vector<double> nodeValues = outputLayer->CalculateOutputLayerNodeValues(dataPoint->expectedOutputs);
-	outputLayer->UpdateGradients(nodeValues);
+
+	std::vector<std::vector<double>> nodeValuesArr;
+
+	nodeValuesArr.emplace_back(outputLayer->CalculateOutputLayerNodeValues(dataPoint->expectedOutputs));
 
 	// Update gradients of the hidden layers
 	for (int hiddenLayerIndex = layers.size() - 2; hiddenLayerIndex >= 0; hiddenLayerIndex--)
 	{
 		Layer* hiddenLayer = layers[hiddenLayerIndex];
-		nodeValues = hiddenLayer->CalculateHiddenLayerNodeValues(layers[hiddenLayerIndex + 1], nodeValues);
-		hiddenLayer->UpdateGradients(nodeValues);
+		nodeValuesArr.emplace_back(hiddenLayer->CalculateHiddenLayerNodeValues(layers[hiddenLayerIndex + 1], nodeValuesArr[(layers.size() - 2) - hiddenLayerIndex]));
+	}
+
+	std::unique_lock<std::mutex> lock(threadPool->mutex);
+	{
+		for (int i = nodeValuesArr.size() - 1; i >= 0; i--)
+		{
+			layers[i]->UpdateGradients(nodeValuesArr[i]);
+		}
 	}
 }
 
 void NeuralNetwork::ApplyAllGradients(double learnRate)
 {
-	for (Layer* layer : layers) {
-		layer->ApplyGradients(learnRate);
+	std::unique_lock<std::mutex> lock(threadPool->mutex); 
+	{
+		for (Layer* layer : layers) {
+			layer->ApplyGradients(learnRate);
+		}
 	}
 }
 
@@ -218,19 +230,21 @@ void NeuralNetwork::BatchLearn(std::vector<DataPoint*> trainingData, std::vector
 
 	threadPool = new ThreadPool(std::thread::hardware_concurrency());
 
-	for (int i = 0; i < numBatches; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		MiniBatch(trainingData, (i * batchSize), batchSize, learnRate, threadPool);
+		threadPool->Enqueue([this, &trainingData, i, batchSize, learnRate]() { MiniBatch(trainingData, (i * batchSize), batchSize, learnRate); });
 	}
+
+	threadPool->Wait();
 
 }
 
-void NeuralNetwork::MiniBatch(std::vector<DataPoint*> trainingData, int startIndex, int batchSize, double learnRate, ThreadPool* pool)
+void NeuralNetwork::MiniBatch(std::vector<DataPoint*> trainingData, int startIndex, int batchSize, double learnRate)
 {
 	std::vector<DataPoint*>::const_iterator first = trainingData.begin() + startIndex;
 	std::vector<DataPoint*>::const_iterator last = first + batchSize;
 
-	pool->Enqueue([this, first, last, learnRate]() {Learn({ first, last }, learnRate); });
+	Learn({ first, last }, learnRate);
 }
 
 void NeuralNetwork::PrintOutputs(std::vector<double> inputs)
@@ -246,9 +260,14 @@ void NeuralNetwork::PrintOutputs(std::vector<double> inputs)
 	}
 
 	for (int i = 0; i < outputs.size(); i++) {
-		std::string percent = HelperFunctions::DoubleToStringWithPrecision((outputs[i] / total) * 100);
+		if (total < 0.0005) {
+			std::cout << "0%\n";
+		}
+		else {
+			std::string percent = HelperFunctions::DoubleToStringWithPrecision((outputs[i] / total) * 100);
 
-		std::cout << i << ": " << percent << "%\n";
+			std::cout << i << ": " << percent << "%\n";
+		}
 	}
 
 	std::cout << std::endl;

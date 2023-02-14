@@ -27,16 +27,21 @@ public:
 	}
 
 	void Wait() {
-		while (!tasks.empty()) {}
+		while (!tasks.empty()) {
+			std::cout << "help\n";
+		}
 
-		for (auto& thread : threads)
-			thread.join();
+		Stop();
+
+		//for (auto& thread : threads)
+			//thread.join();
 	}
+
+	std::mutex mutex;
 
 private:
 	std::vector<std::thread> threads;
 	std::condition_variable condition;
-	std::mutex mutex;
 	std::queue<Task> tasks;
 
 	bool running = false;
@@ -60,7 +65,7 @@ private:
 					}
 					task();
 				}
-				});
+			});
 		}
 	}
 
