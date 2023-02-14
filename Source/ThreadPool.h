@@ -26,6 +26,13 @@ public:
 		condition.notify_one();
 	}
 
+	void Wait() {
+		while (!tasks.empty()) {}
+
+		for (auto& thread : threads)
+			thread.join();
+	}
+
 private:
 	std::vector<std::thread> threads;
 	std::condition_variable condition;

@@ -44,7 +44,7 @@ public:
 
     void BatchLearn(std::vector<DataPoint*> trainingData, double learnRate, int batchSize);
     void BatchLearn(std::vector<DataPoint*> trainingData, std::vector<DataPoint*> testingData, double learnRate, int batchSize);
-    void MiniBatch(std::vector<DataPoint*> trainingData, int startIndex, int batchSize, double learnRate);
+    void MiniBatch(std::vector<DataPoint*> trainingData, int startIndex, int batchSize, double learnRate, ThreadPool* pool);
 
     void PrintOutputs(std::vector<double> inputs);
 
@@ -53,4 +53,6 @@ private:
     int LargestOutput(std::vector<double> outputs);
 
     std::vector<Layer*> layers;
+
+    ThreadPool* threadPool;
 };
