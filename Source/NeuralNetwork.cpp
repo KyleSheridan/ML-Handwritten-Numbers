@@ -178,6 +178,7 @@ void NeuralNetwork::BatchLearn(std::vector<DataPoint*> trainingData, double lear
 	std::cout << "\rLearning Complete!\n";
 }
 
+/*
 void NeuralNetwork::BatchLearn(std::vector<DataPoint*> trainingData, std::vector<DataPoint*> testingData, double learnRate, int batchSize)
 {
 	int NumBatches = trainingData.size() / batchSize;
@@ -192,7 +193,7 @@ void NeuralNetwork::BatchLearn(std::vector<DataPoint*> trainingData, std::vector
 		if (i % (NumBatches / 100) == 0) {
 			percent++;
 		}
-
+		
 		MiniBatch(trainingData, (i * batchSize), batchSize, learnRate);
 
 		std::shuffle(testingData.begin(), testingData.end(), g);
@@ -209,6 +210,38 @@ void NeuralNetwork::BatchLearn(std::vector<DataPoint*> trainingData, std::vector
 
 	std::cout << '\r' << std::string(learingLine.length(), ' ') << '\r';
 	std::cout << "Learning Complete! \nFinal Success Rate: " << finalTestResult << "%\n";
+}*/
+
+void NeuralNetwork::BatchLearn(std::vector<DataPoint*> trainingData, std::vector<DataPoint*> testingData, double learnRate, int batchSize)
+{
+	int numBatches = trainingData.size() / batchSize;
+
+	ThreadPool threadPool(std::thread::hardware_concurrency());
+
+	int percent = -1;
+	std::random_device rd;
+	std::mt19937 g(rd());
+
+	std::string learingLine;
+	for (int i = 0; i < numBatches; i++)
+	{
+		if (i % (numBatches / 100) == 0) {
+			percent++;
+		}
+
+		threadPool.Enqueue(std::bind(MiniBatch, trainingData, (i * batchSize), batchSize, learnRate));
+
+		//std::string testResult = HelperFunctions::DoubleToStringWithPrecision(Test(testBatch));
+
+		std::cout << '\r' << std::string(learingLine.length(), ' ') << '\r';
+		learingLine = "Network Learning: " + std::to_string(percent) + "%";
+		std::cout << '\r' << learingLine;
+	}
+
+	//std::string finalTestResult = HelperFunctions::DoubleToStringWithPrecision(Test(testingData));
+
+	//std::cout << '\r' << std::string(learingLine.length(), ' ') << '\r';
+	//std::cout << "Learning Complete! \nFinal Success Rate: " << finalTestResult << "%\n";
 }
 
 void NeuralNetwork::MiniBatch(std::vector<DataPoint*> trainingData, int startIndex, int batchSize, double learnRate)

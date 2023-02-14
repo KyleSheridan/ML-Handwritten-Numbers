@@ -5,10 +5,12 @@
 #include <random>
 #include <string>
 #include <float.h>
+#include <thread>
 
 #include "Layer.h";
 #include "DataPoint.h"
 #include "HelperFunctions.h"
+#include "ThreadPool.h"
 
 class NeuralNetwork {
 public:
